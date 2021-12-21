@@ -1,6 +1,7 @@
 import decompressTar from "@xingrz/decompress-tar"
 import { File } from "@xingrz/decompress-types"
 import fetch from "node-fetch"
+import { parseRules } from "parseRules"
 import { unzipSync } from "zlib"
 
 // @ts-expect-error: Weird fix
@@ -18,6 +19,10 @@ async function obtainFiles(url: string) {
   return files
 }
 
+function throwExpr(error: Error): never {
+  throw error
+}
+
 /** Categorize the tzdata files and check everything is there */
 function organizeFiles(files: File[]) {
   const ruleFilesNames = [
@@ -33,44 +38,36 @@ function organizeFiles(files: File[]) {
   ]
   const organizedFiles = {
     ruleFiles: files.flatMap(file => (ruleFilesNames.includes(file.path) ? [file] : [])),
-    backward: files.find(file => file.path === "backward"),
-    backzone: files.find(file => file.path === "backzone"),
-    leapSeconds: files.find(file => file.path === "leap-seconds.list"),
-    countryCodes: files.find(file => file.path === "iso3166.tab"),
-    zoneInfo: files.find(file => file.path === "zone1970.tab"),
+    backward:
+      files.find(file => file.path === "backward") || throwExpr(new Error("backward file with old links is missing")),
+    backzone:
+      files.find(file => file.path === "backzone") || throwExpr(new Error("backzone file with old rules is missing")),
+    leapSeconds:
+      files.find(file => file.path === "leap-seconds.list") || throwExpr(new Error("leap-seconds.list is missing")),
+    countryCodes:
+      files.find(file => file.path === "iso3166.tab") ||
+      throwExpr(new Error("iso3166.tab file with countrycodes is missing")),
+    zoneInfo:
+      files.find(file => file.path === "zone1970.tab") ||
+      throwExpr(new Error("zone1970.tab file with info about zones is missing")),
   }
 
-  if (organizedFiles.ruleFiles.length !== ruleFilesNames.length) {
+  if (organizedFiles.ruleFiles.filter(file => !!file?.data).length !== ruleFilesNames.length) {
     throw new Error(
       `Some rule files are missing from the archive.
        Got:     [${organizedFiles.ruleFiles
-         .filter(file => !!file)
+         .filter(file => !!file?.data)
          .map(file => file.path)
          .sort()
          .join(", ")}]
        Expected: [${ruleFilesNames.sort().join(", ")}]`
     )
   }
-  if (!organizedFiles.backward) {
-    throw new Error("backward file with old links is missing")
-  }
-  if (!organizedFiles.backzone) {
-    throw new Error("backzone file with old rules is missing")
-  }
-  if (!organizedFiles.leapSeconds) {
-    throw new Error("leap-seconds.list is missing")
-  }
-  if (!organizedFiles.countryCodes) {
-    throw new Error("iso3166.tab file with countrycodes is missing")
-  }
-  if (!organizedFiles.zoneInfo) {
-    throw new Error("zone1970.tab file with info about zones is missing")
-  }
 
-  return organizedFiles
+  return organizedFiles as NonNullable<typeof organizedFiles>
 }
 
 const files = await obtainFiles("https://data.iana.org/time-zones/releases/tzdata2021e.tar.gz")
 const organizedFiles = organizeFiles(files)
 
-console.log(files, organizedFiles)
+console.log(parseRules(organizedFiles.ruleFiles[0].data!))
