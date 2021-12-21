@@ -6,7 +6,7 @@
       "*": ["src/*"]
     },
     "target": "es2015",
-    "module": "esnext",
+    "module": "es2015",
     "strict": true,
     "esModuleInterop": false,
     "skipLibCheck": true,
@@ -22,7 +22,8 @@
     "noImplicitReturns": true,
     "noImplicitAny": true,
     "incremental": true,
-    "declaration": true
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
   "include": ["src/*"]
 }
