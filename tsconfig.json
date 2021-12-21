@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
+    "baseUrl": "./",
     "paths": {
-      "*": ["/src/*"]
+      "*": ["src/*"]
     },
     "target": "es2015",
     "module": "esnext",
