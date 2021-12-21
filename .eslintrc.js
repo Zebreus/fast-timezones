@@ -27,7 +27,6 @@ module.exports = {
     "import/no-anonymous-default-export": "error",
 
     //Static import analysis
-    "import/no-unresolved": "error",
     "import/named": "off",
     "import/default": "error",
     "import/namespace": "error",
@@ -39,12 +38,12 @@ module.exports = {
     "import/export": "error",
     "import/no-unused-modules": "error",
     "import/no-deprecated": "error",
-    "import/no-unused-modules": "error",
     "import/no-named-as-default": "off",
     "import/no-named-as-default-member": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }],
   },
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     parser: "@typescript-eslint/parser",
     ecmaVersion: 2018,
@@ -53,7 +52,7 @@ module.exports = {
   settings: {
     "import/external-module-folders": ["node_modules", "node_modules/@types"],
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"],
+      "@typescript-eslint/parser": ["*.ts", "*.tsx"],
     },
     "import/resolver": {
       node: {
