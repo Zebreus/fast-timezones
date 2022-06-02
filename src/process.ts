@@ -70,4 +70,4 @@ function organizeFiles(files: File[]) {
 const files = await obtainFiles("https://data.iana.org/time-zones/releases/tzdata2021e.tar.gz")
 const organizedFiles = organizeFiles(files)
 
-console.log(parseRules(organizedFiles.ruleFiles[0].data!))
+console.log(parseRules(organizedFiles.ruleFiles[5].data!))

@@ -98,7 +98,7 @@ export function parseRules(content: Buffer) {
   const tokens = tokenize(content)
   let lastToken: Token | undefined
 
-  let results = {
+  const results = {
     rules: [] as Rule[],
     zones: [] as Zone[],
     links: [] as Link[],
@@ -148,8 +148,8 @@ export function parseRules(content: Buffer) {
 }
 
 function parseLink(consumeToken: () => Token) {
-  const name = consumeToken()
   const real = consumeToken()
+  const name = consumeToken()
   const newline = consumeToken()
   return {
     name: name.token,
@@ -163,20 +163,20 @@ function parseZone(consumeToken: () => Token, name: Token) {
   const rule = ruleToken.token !== "-" ? ruleToken : undefined
   const abbreviation = consumeToken()
 
-  let until: string | undefined = ""
+  const until: string[] = []
   let token = consumeToken()
   while (token.token !== "\n") {
-    until += token.token
+    until.push(token.token)
     token = consumeToken()
   }
-  until = until || undefined
+  const untilString = until.join(" ") || undefined
 
   return {
     name: name.token,
     offset: offset.token,
     rule: rule?.token,
     abbreviation: abbreviation.token,
-    until: until,
+    until: untilString,
   } as Zone
 }
 
